@@ -3,6 +3,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/hospital
     username: postgres
     password: HOSPITAL3COURSE
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
   jpa:
     hibernate:

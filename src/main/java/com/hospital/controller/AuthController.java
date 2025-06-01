@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
 
@@ -30,20 +29,30 @@ public class AuthController {
         this.jwtConfig      = jwtConfig;
     }
 
+    // Старая ссылка: POST /api/auth/login
+    @PostMapping("/api/auth/login")
+    public ResponseEntity<?> loginApi(@RequestBody LoginRequest creds) {
+        return doLogin(creds);
+    }
+
+    // Новая ссылка: POST /login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest creds) {
-        // Попытка аутентифицировать пациента
+    public ResponseEntity<?> loginRoot(@RequestBody LoginRequest creds) {
+        return doLogin(creds);
+    }
+
+    // Вынесли общую логику в приватный метод
+    private ResponseEntity<?> doLogin(LoginRequest creds) {
+        // <--- здесь ваша старая логика из AuthController.login() ---
         return patientService.login(creds.getPhone(), creds.getPassword())
-                .map(p -> buildResponse(p.getId(), "patient",
-                        Map.of("name", p.getFirstName() + " " + p.getLastName())))
-                // Если не пациент – пытаемся сотрудника
+                .map(p -> buildResponse(p.getId(), "patient", Map.of("name", p.getFirstName() + " " + p.getLastName())))
                 .or(() -> staffService.login(creds.getPhone(), creds.getPassword())
                         .map(s -> buildResponse(s.getId(), "staff",
                                 Map.of("name",     s.getFirstName() + " " + s.getLastName(),
                                         "position", s.getPosition()))))
                 .orElseGet(() ->
-                        ResponseEntity.status(401)
-                                .body(Map.of("error", "Invalid credentials")));
+                        ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"))
+                );
     }
 
     private ResponseEntity<Map<String,Object>> buildResponse(int id, String role, Map<String,Object> extras) {
