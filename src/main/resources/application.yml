@@ -15,3 +15,16 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
     drop-first: true
+logging:
+    level:
+      org:
+        springframework:
+          web:
+            servlet:
+              mvc:
+                method:
+                  annotation:
+                    RequestMappingHandlerMapping=DEBUG:
+server:
+  servlet:
+    context-path: /hospital-system

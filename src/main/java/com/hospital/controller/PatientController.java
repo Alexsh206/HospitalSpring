@@ -15,20 +15,16 @@ import java.util.Objects;
 @RequestMapping("/api/patients")
 @CrossOrigin(origins = "*")
 public class PatientController {
-
     private final PatientService patientService;
-
     public PatientController(PatientService patientService) {
         this.patientService = patientService;
     }
 
-    // GET  /api/patients
     @GetMapping
     public List<Patient> getAll() {
         return patientService.findAll();
     }
 
-    // GET  /api/patients/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getById(@PathVariable Integer id) {
         return patientService.findById(id)
@@ -36,17 +32,14 @@ public class PatientController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/patients
     @PostMapping
     public ResponseEntity<Patient> create(@RequestBody Patient p) {
         Patient created = patientService.create(p);
         return ResponseEntity.ok(created);
     }
 
-    // PUT  /api/patients/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Patient> update(@PathVariable Integer id,
-                                          @RequestBody Patient p) {
+    public ResponseEntity<Patient> update(@PathVariable Integer id, @RequestBody Patient p) {
         return patientService.findById(id)
                 .map(existing -> {
                     p.setId(id);
@@ -56,7 +49,6 @@ public class PatientController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/patients/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (patientService.findById(id).isPresent()) {
@@ -65,21 +57,5 @@ public class PatientController {
         }
         return ResponseEntity.notFound().build();
     }
-
-    // POST /api/patients/login
-    @PostMapping("/login")
-    public ResponseEntity<Patient> login(@RequestBody LoginRequest creds) {
-        return patientService.login(creds.getPhone(), creds.getPassword())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(401).build());
-    }
-
-    // DTO for login credentials
-    @Setter
-    @Getter
-    public static class LoginRequest {
-        private String phone;
-        private String password;
-
-    }
 }
+
